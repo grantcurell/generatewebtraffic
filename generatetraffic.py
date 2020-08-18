@@ -33,40 +33,6 @@ def run(refresh_rate, jitter, duration, url_list, job_number):
 
         browser.get(url_list[index])
 
-        """
-
-        Taken from: https://www.lambdatest.com/blog/how-to-measure-page-load-times-with-selenium/
-
-        navigation_start – This attribute returns the time spent after the user agent completes unloading the 
-        previous page/document. If there was no document prior to loading the new page, navigationStart returns the
-         same value as fetchStart.
-
-        responseStart – This attribute returns the time as soon as the user-agent receives the first byte from the 
-        server or from the local sources/application cache.
-
-        domComplete – This attribute returns the time just before the current document/page readiness is set to 
-        ‘complete’. document.readyState status as ‘complete’ indicates that the parsing of the page/document is 
-        complete & all the resources required for the page are downloaded. We will have a look an example of 
-        domComplete in subsequent section.
-
-        """
-
-        # Use Navigation Timing  API to calculate the timings that matter the most
-        navigation_start = browser.execute_script("return window.performance.timing.navigationStart")
-        response_start = browser.execute_script("return window.performance.timing.responseStart")
-        dom_complete = browser.execute_script("return window.performance.timing.domComplete")
-
-        # Calculate the performance
-        backend_performance_calc = response_start - navigation_start
-        frontend_performance_calc = dom_complete - response_start
-
-        # TODO I noticed this won't print from inside a thread. For this reason I used print. Haven't investigated why.
-        # TODO It seems to apply to any call to logging.
-        logging.debug("Back End: %s" % backend_performance_calc)
-        logging.debug("Front End: %s" % frontend_performance_calc)
-
-        print("Load time for browser # " + job_number + " ~:" + str(frontend_performance_calc) + "ms.")
-
         next_jitter = randint(0, jitter)
 
         # If less than 50 we will make the jitter negative, otherwise it will be positive.

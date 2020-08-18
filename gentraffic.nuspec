@@ -1,0 +1,10 @@
+<?xml version="1.0" encoding="utf-8"?>
+<package xmlns="http://schemas.microsoft.com/packaging/2010/07/nuspec.xsd">
+    <metadata>
+        <id>genwebtraffic</id>
+        <version>1.0</version>
+        <description>Uses Seleneium and Python to send web traffic to a list of websites.</description>
+        <authors>Grant Curell (grant_curell@dell.com)</authors>
+        <requireLicenseAcceptance>false</requireLicenseAcceptance>
+    </metadata>
+</package>
