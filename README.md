@@ -1,10 +1,18 @@
 # README
 
 ## Setup 
-1. Download the chromedriver for Selenium [from here](https://chromedriver.chromium.org/downloads). Place it in the same directory as `run.py`.
-2. Run `yum update -y` to make sure everything is up to date. Reboot if you have any kernel updates.
-3. Install python 3 with `yum install -y python3`
-4. Run `pip3 install selenium` to install selenium
+
+### Install Chocolatey
+
+If you haven't already, install Chocolatey. See [installation guide](https://chocolatey.org/docs/installation).
+
+### Install the Traffic Generator
+
+Pull the code from [the repository](https://github.com/grantcurell/generatewebtraffic/archive/master.zip)
+
+
+
+
 
 ## Usage
 Run `python3 run.py` for usage information on CentOS.
