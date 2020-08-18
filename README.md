@@ -8,15 +8,8 @@ If you haven't already, install Chocolatey. See [installation guide](https://cho
 
 ### Install the Traffic Generator
 
-Pull the code from [the repository](https://github.com/grantcurell/generatewebtraffic/archive/master.zip)
+Pull the code from [the repository](https://github.com/grantcurell/generatewebtraffic/archive/master.zip) and unzip it into a location of your choosing.
 
+After you have the code, open an administrative command prompt, and navigate to the unzipped directory.
 
-
-
-
-## Usage
-Run `python3 run.py` for usage information on CentOS.
-Run `python run.py` for usage information on Windows.
-
-## Version
-I built and tested using Python v3.8.0 on Windows 10.
+Run `nuget pack` to build the Chocolatey package.

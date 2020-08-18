@@ -8,6 +8,6 @@
         <requireLicenseAcceptance>false</requireLicenseAcceptance>
     </metadata>
 <files>
-    <file src="**" target="content\docs" exclude=".gitignore;chocolateyInstall.ps1"/>
+    <file src="**" exclude=".gitignore"/>
 </files>
 </package>
