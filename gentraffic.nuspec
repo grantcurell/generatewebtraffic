@@ -7,4 +7,7 @@
         <authors>Grant Curell (grant_curell@dell.com)</authors>
         <requireLicenseAcceptance>false</requireLicenseAcceptance>
     </metadata>
+<files>
+    <file src="**" target="content\docs" exclude=".gitignore;chocolateyInstall.ps1"/>
+</files>
 </package>
