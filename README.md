@@ -13,3 +13,7 @@ Pull the code from [the repository](https://github.com/grantcurell/generatewebtr
 After you have the code, open an administrative command prompt, and navigate to the unzipped directory.
 
 Run `nuget pack` to build the Chocolatey package.
+Run `choco install -y <generate_package>` to install the traffic generator.
+
+## Usage
+

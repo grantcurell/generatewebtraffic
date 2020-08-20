@@ -6,32 +6,44 @@ from argparse import ArgumentParser
 from time import time, sleep
 from random import randint
 from selenium import webdriver
+from multiprocessing.pool import Pool
 import logging
 import yaml
 import os
-from multiprocessing.pool import Pool
+import dns.resolver as dns_resolver
+import validators
+import random
 
 
-def run(refresh_rate, jitter, duration, url_list, job_number):
+def run(refresh_rate, jitter, duration, url_list, dns_frequency, dns_list=[]):
     """
     Runs an instance of Selenium webdriver and browses to a URL.
 
     :param refresh_rate: int - See help text
     :param jitter: int - See help text.
     :param duration: int - See help text
-    :param url_list: str - See help text
-    :param job_number: str - Used in console output to differentiate between multiple threads.
+    :param url_list: list - A list of the URLs you want the browser to visit
+    :param dns_list: list - A list of the DNS servers you want to query
+    :param dns_frequency: int - See help text
     """
 
     browser = webdriver.Chrome()
 
     stop_time = time() + duration
 
-    index = 0
+    resolver = dns_resolver.dns.resolver.Resolver()
+
+    resolver.nameservers = dns_list
 
     while time() + refresh_rate < stop_time:
 
-        browser.get(url_list[index])
+        if len(dns_list) > 1:
+            resolver.nameservers = dns_list[random.randint(0, len(dns_list)-1)]
+
+        wat = random.randint(0, len(url_list)-1)
+        browser.get(url_list[wat])
+        if len(dns_list) > 0 and random.randint(0, 100) < dns_frequency:
+            resolver.query(url_list[random.randint(0, len(url_list)-1)].replace("http://", "").replace("https://", "").replace("www.", ""))
 
         next_jitter = randint(0, jitter)
 
@@ -55,11 +67,6 @@ def run(refresh_rate, jitter, duration, url_list, job_number):
 
         sleep(next_refresh)
 
-        browser.refresh()
-
-        if index == len(url_list):
-            index = 0
-
     browser.quit()
 
 
@@ -69,6 +76,10 @@ def main():
                         help='The url you would like the worker threads to browse to.')
     parser.add_argument('--yml', metavar='YML', dest="yml", type=str, required=False,
                         help='A YAML file with a configuration you would like to use. Defaults to config.yml.')
+    parser.add_argument('--dnsfrequency', metavar='frequency', dest="dns_frequency", type=int, required=False,
+                        default=20, help='The percentage of requests that should be accompanied by a DNS request. The'
+                                        ' random module is used for this so the longer the run the closer to this'
+                                        ' percentage the actual send rate will be.')
     parser.add_argument('--browsers', metavar='num_browsers', dest="number_of_browsers", type=int, required=False,
                         default=10, help='The number of browsers you want to use to test the Kibana dashboard.')
     parser.add_argument('--refresh-rate', metavar='seconds', dest="refresh_rate", type=int, required=False, default=20,
@@ -91,6 +102,8 @@ def main():
     usage = 'python run.py --url http://192.168.65.129:5601 --browsers 3 ' \
             '--refresh-rate 5 --jitter 1 --duration 20'
     yaml_config = None
+    dns = []
+    urls = None
 
     if args.yml and args.url:
         logging.error("You cannot use --url and --yml. You must use one or the other.")
@@ -106,10 +119,12 @@ def main():
             logging.error(args.yml + " is not a valid file path. Are you sure you spelled everything correctly?")
         with open(args.yml, "r") as yaml_file:
             yaml_config = yaml.load(yaml_file, Loader=yaml.FullLoader)
+            args.url = None
     elif not args.url:
         if os.path.isfile("config.yml"):
             with open("config.yml", "r") as yaml_file:
                 yaml_config = yaml.load(yaml_file, Loader=yaml.FullLoader)
+                args.url = None
         else:
             logging.error("You have not provided the arguments --url or --yml and the default configuration file"
                           " \'config.yml\' does not exist. Exiting.")
@@ -117,10 +132,24 @@ def main():
     if yaml_config and ("urls" not in yaml_config or len(yaml_config["urls"]) < 1):
         logging.error("Your YML file is missing the \'urls\' list. This is a required field.")
         exit(0)
+    else:
+        if "dns" in yaml_config and len(yaml_config["dns"]) > 0:
+            dns = yaml_config["dns"]
+        urls = yaml_config["urls"]
+
+    if urls:
+        for url in urls:
+            if not validators.url(url) or ("http" not in url and "https" not in url):
+                logging.error(url + " does not have the full url. You must provide the full URL including http/https.")
+                exit(1)
 
     if args.print_usage:
         print(usage)
         exit(0)
+
+    if args.dns_frequency > 100 or args.dns_frequency < 0:
+        logging.error("The DNS frequency must be a percentage.")
+        exit(1)
 
     if args.refresh_rate <= 0:
         logging.critical("Refresh rate must be set to a positive value.")
@@ -154,8 +183,11 @@ def main():
     logging.debug("Creating multithreaded pool to which we will issue jobs.")
     with Pool(processes=args.number_of_browsers) as pool:
         for i in range(args.number_of_browsers):
-            logging.info("Starting job on browser #" + str(i))
-            pool.apply_async(run, args=(args.refresh_rate, args.jitter, args.duration, args.url, str(i)))
+            logging.info("Starting job on browser #" + str(i+1))
+            if args.url:
+                pool.apply_async(run, args=(args.refresh_rate, args.jitter, args.duration, [args.url], args.dns_frequency, dns))
+            else:
+                pool.apply_async(run, args=(args.refresh_rate, args.jitter, args.duration, urls, args.dns_frequency, dns))
 
         # This line is required. If you do not have this wait in place, apply_async will immediately issue all the
         # threads and then continue. The only thing after this is the end of the program which will cause

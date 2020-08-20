@@ -1,4 +1,6 @@
 
 urls:
-  - "google.com"
-  - "facebook.com"
+  - "http://www.google.com"
+  - "http://www.facebook.com"
+dns:
+  - "1.1.1.1"
