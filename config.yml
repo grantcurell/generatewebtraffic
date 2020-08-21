@@ -2,5 +2,7 @@
 urls:
   - "http://www.google.com"
   - "http://www.facebook.com"
+  - "http://www.cnn.com"
+  - "http://www.ebay.com"
 dns:
   - "1.1.1.1"

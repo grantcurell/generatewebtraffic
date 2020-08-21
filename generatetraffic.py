@@ -1,4 +1,4 @@
-__author__ = "Grant Curell"
+__author__ = "Grant Curell <grant_curell@dell.com>"
 __copyright__ = "Do what you want with it"
 __license__ = "GPLv3"
 
@@ -15,7 +15,7 @@ import validators
 import random
 
 
-def run(refresh_rate, jitter, duration, url_list, dns_frequency, dns_list=[]):
+def run(refresh_rate, jitter, duration, url_list, dns_frequency, dns_list):
     """
     Runs an instance of Selenium webdriver and browses to a URL.
 
@@ -23,8 +23,8 @@ def run(refresh_rate, jitter, duration, url_list, dns_frequency, dns_list=[]):
     :param jitter: int - See help text.
     :param duration: int - See help text
     :param url_list: list - A list of the URLs you want the browser to visit
-    :param dns_list: list - A list of the DNS servers you want to query
     :param dns_frequency: int - See help text
+    :param dns_list: list - A list of the DNS servers you want to query
     """
 
     browser = webdriver.Chrome()
@@ -43,7 +43,8 @@ def run(refresh_rate, jitter, duration, url_list, dns_frequency, dns_list=[]):
         wat = random.randint(0, len(url_list)-1)
         browser.get(url_list[wat])
         if len(dns_list) > 0 and random.randint(0, 100) < dns_frequency:
-            resolver.query(url_list[random.randint(0, len(url_list)-1)].replace("http://", "").replace("https://", "").replace("www.", ""))
+            resolver.query(url_list[random.randint(0, len(url_list)-1)].replace("http://", "")
+                           .replace("https://", "").replace("www.", ""))
 
         next_jitter = randint(0, jitter)
 
@@ -65,6 +66,9 @@ def run(refresh_rate, jitter, duration, url_list, dns_frequency, dns_list=[]):
 
         logging.debug("Next refresh will be in " + str(next_refresh) + " seconds.")
 
+        if duration == 0:
+            stop_time = stop_time + refresh_rate + jitter + 5
+
         sleep(next_refresh)
 
     browser.quit()
@@ -81,15 +85,16 @@ def main():
                                         ' random module is used for this so the longer the run the closer to this'
                                         ' percentage the actual send rate will be.')
     parser.add_argument('--browsers', metavar='num_browsers', dest="number_of_browsers", type=int, required=False,
-                        default=10, help='The number of browsers you want to use to test the Kibana dashboard.')
-    parser.add_argument('--refresh-rate', metavar='seconds', dest="refresh_rate", type=int, required=False, default=20,
-                        help='How often the browsers will refresh themselves after being opened.')
+                        default=10, help='The number of browsers you want to deploy.')
+    parser.add_argument('--refreshrate', metavar='seconds', dest="refresh_rate", type=int, required=False, default=20,
+                        help='How often the browsers will open new pages.')
     parser.add_argument('--jitter', metavar='seconds', dest="jitter", type=int, required=False, default=10,
                         help='Controls randomness in the refresh rate up or down. For example if your refresh rate is '
                              '20 seconds and jitter is five, the refreshes will happen in between 15 and 25 seconds at '
                              'random. The default is 10 seconds. Set to 0 to remove jitter.')
     parser.add_argument('--duration', metavar='seconds', dest="duration", type=int, required=False, default=60,
-                        help='The test duration measured in seconds. The default is 60.')
+                        help='The duration for which you want the browsers to run. Set to 0 for infinite. The default '
+                             'is 60.')
     parser.add_argument('--log-level', metavar='log_level', dest="log_level", required=False, type=str, default="info",
                         choices=['debug', 'info', 'warning', 'error', 'critical'],
                         help='Set the log level used by the program. Options are debug, info, warning, error, and '
@@ -181,18 +186,27 @@ def main():
 
     logging.info("Beginning test.")
     logging.debug("Creating multithreaded pool to which we will issue jobs.")
-    with Pool(processes=args.number_of_browsers) as pool:
-        for i in range(args.number_of_browsers):
-            logging.info("Starting job on browser #" + str(i+1))
-            if args.url:
-                pool.apply_async(run, args=(args.refresh_rate, args.jitter, args.duration, [args.url], args.dns_frequency, dns))
-            else:
-                pool.apply_async(run, args=(args.refresh_rate, args.jitter, args.duration, urls, args.dns_frequency, dns))
+
+    if args.disable_threading:
+        if args.url:
+            run(args.refresh_rate, args.jitter, args.duration, [args.url], args.dns_frequency, dns)
+        else:
+            run(args.refresh_rate, args.jitter, args.duration, urls, args.dns_frequency, dns)
+    else:
+        with Pool(processes=args.number_of_browsers) as pool:
+            for i in range(args.number_of_browsers):
+                logging.info("Starting job on browser #" + str(i+1))
+                if args.url:
+                    pool.apply_async(run, args=(args.refresh_rate, args.jitter, args.duration, [args.url],
+                                                args.dns_frequency, dns))
+                else:
+                    pool.apply_async(run, args=(args.refresh_rate, args.jitter, args.duration, urls, args.dns_frequency,
+                                                dns))
 
         # This line is required. If you do not have this wait in place, apply_async will immediately issue all the
         # threads and then continue. The only thing after this is the end of the program which will cause
         # python to forcefully terminate the threads it just created without doing anything.
-        sleep(args.duration + 10)
+        sleep(args.duration + args.jitter)
 
 
 if __name__ == '__main__':
