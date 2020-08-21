@@ -10,7 +10,7 @@ You will also need to install `Nuget` with `choco install nuget.commandline --pr
 ### Install the Traffic Generator
 
 # TODO - update this
-Pull the code from [the repository](https://github.com/grantcurell/generatewebtraffic/releases/tag/alpha1) and unzip it into a location of your choosing.
+Pull the code from [the repository](https://github.com/grantcurell/generatewebtraffic/releases/download/beta1/generatewebtraffic.zip) and unzip it into a location of your choosing.
 
 After you have the code, open an administrative command prompt, and navigate to the unzipped directory.
 
