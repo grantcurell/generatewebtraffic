@@ -206,14 +206,14 @@ def main():
             # This line is required. If you do not have this wait in place, apply_async will immediately issue all the
             # threads and then continue. The only thing after this is the end of the program which will cause
             # python to forcefully terminate the threads it just created without doing anything.
-            sleep(args.duration + args.jitter + 10)
+            sleep(args.duration + args.jitter)
 
     # Selenium's behavior using the Pool module was not predictable. Sometimes it would exit gracefully and sometimes
     # it wouldn't. In this case I found it better to force kill everything.
     if os.name == 'nt':
+        logging.info("Force killing chrome.exe and chromedriver.exe to ensure proper cleanup.")
         os.system("taskkill /F /im chrome.exe")
         os.system("taskkill /F /im chromedriver.exe")
-
 
 
 if __name__ == '__main__':
