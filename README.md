@@ -18,6 +18,10 @@ If you want to build the package yourself you will need to run `nuget pack` to b
 If you downloaded from the github release you can simply install the existing package with: 
 `choco install -y <generate_package>` to install the traffic generator and all of its dependencies.
 
+#### Default Location
+
+Installs by default to `c:\programdata\chocolatey\lib\generatetraffic`
+
 ## Usage
 
 | Switch         | Description                                                                                                                                                                                                                                    |
