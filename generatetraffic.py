@@ -206,7 +206,7 @@ def main():
             # This line is required. If you do not have this wait in place, apply_async will immediately issue all the
             # threads and then continue. The only thing after this is the end of the program which will cause
             # python to forcefully terminate the threads it just created without doing anything.
-            sleep(args.duration + args.jitter + 10)
+            sleep(args.duration + args.jitter + args.refresh_rate + 10)
 
 
 if __name__ == '__main__':
