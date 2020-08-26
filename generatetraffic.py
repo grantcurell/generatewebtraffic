@@ -95,6 +95,8 @@ def main():
     parser.add_argument('--duration', metavar='seconds', dest="duration", type=int, required=False, default=60,
                         help='The duration for which you want the browsers to run. Set to 0 for infinite. The default '
                              'is 60.')
+    parser.add_argument('--disablethreading', dest="disable_threading", required=False, action='store_true',
+                        default=False, help='Show example usage.')
     parser.add_argument('--log-level', metavar='log_level', dest="log_level", required=False, type=str, default="info",
                         choices=['debug', 'info', 'warning', 'error', 'critical'],
                         help='Set the log level used by the program. Options are debug, info, warning, error, and '
