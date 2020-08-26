@@ -1,3 +1,3 @@
 choco install -y python3 chromedriver googlechrome
 Update-SessionEnvironment
-pip install -r requirements.txt
+pip install PyYAML selenium validators dnspython
