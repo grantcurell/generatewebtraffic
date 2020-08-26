@@ -107,7 +107,7 @@ def main():
     args = parser.parse_args()
 
     usage = 'python run.py --url http://192.168.65.129:5601 --browsers 3 ' \
-            '--refresh-rate 5 --jitter 1 --duration 20'
+            '--refreshrate 5 --jitter 1 --duration 20'
     yaml_config = None
     dns = []
     urls = None
@@ -199,11 +199,9 @@ def main():
             for i in range(args.number_of_browsers):
                 logging.info("Starting job on browser #" + str(i+1))
                 if args.url:
-                    pool.apply_async(run, args=(args.refresh_rate, args.jitter, args.duration, [args.url],
-                                                args.dns_frequency, dns))
+                    pool.apply_async(run, args=(args.refresh_rate, args.jitter, args.duration, [args.url], args.dns_frequency, dns))
                 else:
-                    pool.apply_async(run, args=(args.refresh_rate, args.jitter, args.duration, urls, args.dns_frequency,
-                                                dns))
+                    pool.apply_async(run, args=(args.refresh_rate, args.jitter, args.duration, urls, args.dns_frequency, dns))
 
         # This line is required. If you do not have this wait in place, apply_async will immediately issue all the
         # threads and then continue. The only thing after this is the end of the program which will cause
