@@ -27,7 +27,9 @@ def run(refresh_rate, jitter, duration, url_list, dns_frequency, dns_list):
     :param dns_list: list - A list of the DNS servers you want to query
     """
 
-    browser = webdriver.Chrome()
+    options = webdriver.ChromeOptions()
+    options.binary_location = "C:\Program Files\Google\Chrome\Application\chrome.exe"
+    browser = webdriver.Chrome(chrome_options=options)
 
     stop_time = time() + duration
 
