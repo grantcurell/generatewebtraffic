@@ -38,4 +38,4 @@ Installs by default to `c:\programdata\chocolatey\lib\generatetraffic`
 
 Run a basic test with a jitter of 3, refreshes every 10 seconds, and 5 concurrent browsers:
 
-`python generatetraffic.py --refreshrate 10 --browsers 5, --jitter 3`
+`python generatetraffic.py --refreshrate 10 --browsers 5 --jitter 3`
