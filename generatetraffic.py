@@ -168,7 +168,7 @@ def main():
         logging.critical("Jitter cannot be less than 0.")
         exit(0)
 
-    if args.duration <= 0:
+    if args.duration < 0:
         logging.critical("Duration must be set to a positive value.")
         exit(0)
 
